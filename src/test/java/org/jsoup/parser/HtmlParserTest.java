@@ -8,6 +8,7 @@ import org.jsoup.select.Elements;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -741,5 +742,20 @@ public class HtmlParserTest {
         String html = "<?xml encoding='UTF-8' ?><body>One</body>";
         Document doc = Jsoup.parse(html);
         assertEquals("<!--?xml encoding='UTF-8' ?--> <html> <head></head> <body> One </body> </html>", StringUtil.normaliseWhitespace(doc.outerHtml()));
+    }
+
+    @Test public void parsesFormWithinTable() {
+        String html = "<html><body><table>" +
+            "<form action=\"/hello.php\" method=\"post\">" +
+            "<tr><td>User:</td><td>" +
+            "<input type=\"text\" name=\"user\" /></td></tr>" +
+            "<tr><td>Password:</td><td>" +
+            "<input type=\"password\" name=\"pass\" /></td></tr>" +
+            "<tr><td><input type=\"submit\" value=\"login\" /></td></tr>" +
+            "</form></table> </body> </html>";
+        Document doc = Jsoup.parse(html);
+        FormElement form = (FormElement)doc.select("form").get(0);
+        ArrayList<Element> inputs = form.getElements();
+        assertEquals(inputs.size(), 3);
     }
 }
